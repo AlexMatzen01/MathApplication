@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 public class MathApplication {
 
     private static final Logger logger = LogManager.getLogger(MathApplication.class);
+    private static final List<String[]> algebraHistory = new ArrayList<>();
 
     // ----------------- Windowed Calculator -----------------
 
@@ -181,7 +182,7 @@ public class MathApplication {
         System.out.println("Area of Shapes");
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("Enter a shape\n-----------------\nrectangle\ntriangle\ncircle\ntrapezoid\nrhombus\nhexagon\noctagon\n-----------------\nto calculate area (or 'exit' to quit): ");
+            System.out.print("Enter a shape\n-----------------\nrectangle\ntriangle\ncircle\ntrapezoid\nrhombus\nhexagon\noctagon\npentagon\n-----------------\nto calculate area (or 'exit' to quit): ");
             String shape = scanner.nextLine().toLowerCase();
             if (shape.equals("exit")) {
                 break;
@@ -234,6 +235,11 @@ public class MathApplication {
                     double a = Double.parseDouble(scanner.nextLine());
                     double area = 2 * (1+Math.sqrt(2)) * Math.pow(a, 2);
                     System.out.println("Side of octagon: " + area + " " + unit + "\u00B2");
+                } else if (shape.equals("pentagon")) {
+                    System.out.print("Enter side length: ");
+                    double a = Double.parseDouble(scanner.nextLine());
+                    double area = 0.25 * Math.sqrt(5 * (5 + 2 * Math.sqrt(5))) * Math.pow(a, 2);
+                    System.out.println("Area of pentagon: " + area + " " + unit + "\u00B2");
                 } else {
                     System.out.println("Invalid shape, please try again.");
                 }
@@ -291,7 +297,7 @@ public class MathApplication {
         System.out.println("Volume of Solids");
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("Enter a solid (cube, rectangular prism, cylinder) to calculate volume (or 'exit' to quit): ");
+            System.out.print("Enter a solid (cube, rectangular prism, cylinder, sphere, cone, pyramid) to calculate volume (or 'exit' to quit): ");
             String solid = scanner.nextLine().toLowerCase();
             if (solid.equals("exit")) {
                 break;
@@ -320,6 +326,25 @@ public class MathApplication {
                     double h = Double.parseDouble(scanner.nextLine());
                     double volume = Math.PI * Math.pow(r, 2) * h;
                     System.out.println("Volume of cylinder: " + volume + " " + unit);
+                } else if (solid.equals("sphere")) {
+                    System.out.print("Enter radius: ");
+                    double r = Double.parseDouble(scanner.nextLine());
+                    double volume = (4.0/3.0) * Math.PI * Math.pow(r, 3);
+                    System.out.println("Volume of sphere: " + volume + " " + unit);
+                } else if (solid.equals("cone")) {
+                    System.out.print("Enter radius: ");
+                    double r = Double.parseDouble(scanner.nextLine());
+                    System.out.print("Enter height: ");
+                    double h = Double.parseDouble(scanner.nextLine());
+                    double volume = (1.0/3.0) * Math.PI * Math.pow(r, 2) * h;
+                    System.out.println("Volume of cone: " + volume + " " + unit);
+                } else if (solid.equals("pyramid")) {
+                    System.out.print("Enter base area: ");
+                    double b = Double.parseDouble(scanner.nextLine());
+                    System.out.print("Enter height: ");
+                    double h = Double.parseDouble(scanner.nextLine());
+                    double volume = (1.0/3.0) * b * h;
+                    System.out.println("Volume of pyramid: " + volume + " " + unit);
                 } else {
                     System.out.println("Invalid solid, please try again.");
                 }
@@ -334,12 +359,12 @@ public class MathApplication {
         System.out.println("Surface Area of Solids");
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("Enter a solid (cube, rectangular prism, sphere) to calculate surface area (or 'exit' to quit): ");
+            System.out.print("Enter a solid (cube, rectangular prism, sphere, cylinder, cone) to calculate surface area (or 'exit' to quit): ");
             String solid = scanner.nextLine().toLowerCase();
             if (solid.equals("exit")) {
                 break;
             }
-            System.out.print("Enter the unit (cm², ft², yd²): ");
+            System.out.print("Enter the unit (cm\u00B2, ft\u00B2, yd\u00B2): ");
             String unit = scanner.nextLine();
             try {
                 if (solid.equals("cube")) {
@@ -361,6 +386,21 @@ public class MathApplication {
                     double r = Double.parseDouble(scanner.nextLine());
                     double surface_area = 4 * Math.PI * Math.pow(r, 2);
                     System.out.println("Surface area of sphere: " + surface_area + " " + unit);
+                } else if (solid.equals("cylinder")) {
+                    System.out.print("Enter radius: ");
+                    double r = Double.parseDouble(scanner.nextLine());
+                    System.out.print("Enter height: ");
+                    double h = Double.parseDouble(scanner.nextLine());
+                    double surface_area = 2 * Math.PI * r * (r + h);
+                    System.out.println("Surface area of cylinder: " + surface_area + " " + unit);
+                } else if (solid.equals("cone")) {
+                    System.out.print("Enter radius: ");
+                    double r = Double.parseDouble(scanner.nextLine());
+                    System.out.print("Enter height: ");
+                    double h = Double.parseDouble(scanner.nextLine());
+                    double slantHeight = Math.sqrt(r * r + h * h);
+                    double surface_area = Math.PI * r * (r + slantHeight);
+                    System.out.println("Surface area of cone: " + surface_area + " " + unit);
                 } else {
                     System.out.println("Invalid solid, please try again.");
                 }
@@ -648,11 +688,9 @@ public class MathApplication {
         }
     }
 
-    // ----------------- Algebra Solver -----------------
     public static void algebra_solver() {
         System.out.println("Algebra Solver");
         Scanner scanner = new Scanner(System.in);
-        List<String[]> history = new ArrayList<>();
         // Create a symbolic evaluator using Matheclipse
         ExprEvaluator evaluator;
         try {
@@ -679,7 +717,8 @@ public class MathApplication {
             System.out.println("11. Perform polynomial long division");
             System.out.println("12. Unit conversion");
             System.out.println("13. View history");
-            System.out.println("14. Exit");
+            System.out.println("14. Clear history");
+            System.out.println("15. Exit");
             System.out.print("Select an option: ");
             String choice = scanner.nextLine();
             try {
@@ -692,7 +731,7 @@ public class MathApplication {
                     String eqForSolve = equation.replace("=", "==");
                     IExpr solutionExpr = evaluator.evaluate("Solve(" + eqForSolve + ", " + var + ")");
                     String solution = solutionExpr.toString().replace("->", "=");
-                    history.add(new String[]{equation, solution.toString()});
+                    algebraHistory.add(new String[]{"Solve: " + equation + " for " + var, solution});
                     System.out.println("Solution for " + var + ": " + solution);
                     // Note: Numeric substitution is not handled in this basic translation.
                 } else if (choice.equals("2")) {
@@ -700,7 +739,9 @@ public class MathApplication {
                     String var = scanner.nextLine().trim();
                     System.out.print("Enter an inequality (e.g., x + 2 > 5): ");
                     String inequality = scanner.nextLine();
-                    IExpr solution = evaluator.evaluate("Reduce(" + inequality + ", " + var + ")");
+                    IExpr solutionExpr = evaluator.evaluate("Reduce(" + inequality + ", " + var + ")");
+                    String solution = solutionExpr.toString();
+                    algebraHistory.add(new String[]{"Inequality: " + inequality + " for " + var, solution});
                     System.out.println("Solution for " + var + ": " + solution);
                 } else if (choice.equals("3")) {
                     List<String> equations = new ArrayList<>();
@@ -718,31 +759,39 @@ public class MathApplication {
                         if (i < equations.size() - 1) sysEqs.append(", ");
                     }
                     sysEqs.append("}");
-                    IExpr solution = evaluator.evaluate("Solve(" + sysEqs.toString() + ")");
+                    IExpr solutionExpr = evaluator.evaluate("Solve(" + sysEqs.toString() + ")");
+                    String solution = solutionExpr.toString();
+                    algebraHistory.add(new String[]{"System: " + sysEqs.toString(), solution});
                     System.out.println("Solution for the system of equations: " + solution);
                 } else if (choice.equals("4")) {
                     System.out.print("Enter a polynomial (e.g., x^2 + 3*x + 2): ");
                     String polynomial = scanner.nextLine();
-                    IExpr factored = evaluator.evaluate("Factor(" + polynomial + ")");
-                    System.out.println("Factored form: " + factored);
+                    IExpr factoredExpr = evaluator.evaluate("Factor(" + polynomial + ")");
+                    String solution = factoredExpr.toString();
+                    algebraHistory.add(new String[]{"Factor: " + polynomial, solution});
+                    System.out.println("Factored form: " + solution);
                 } else if (choice.equals("5")) {
                     System.out.print("Enter the variable for plotting (e.g., x): ");
                     String var = scanner.nextLine().trim();
                     System.out.print("Enter the equation to plot (e.g., x^2 - 4): ");
                     String eqToPlot = scanner.nextLine();
+                    algebraHistory.add(new String[]{"Plot: " + eqToPlot, "Plotted on screen"});
                     // Use our plot_equation function. Replace '^' with '**' is not needed here.
                     plot_equation(eqToPlot, var, "Plot of " + eqToPlot);
                 } else if (choice.equals("6")) {
                     System.out.print("Enter a rational expression (e.g., (x^2 - 1)/(x - 1)): ");
                     String exprStr = scanner.nextLine();
-                    IExpr simplified = evaluator.evaluate("Simplify(" + exprStr + ")");
-                    System.out.println("Simplified form: " + simplified);
+                    IExpr simplifiedExpr = evaluator.evaluate("Simplify(" + exprStr + ")");
+                    String solution = simplifiedExpr.toString();
+                    algebraHistory.add(new String[]{"Simplify: " + exprStr, solution});
+                    System.out.println("Simplified form: " + solution);
                 } else if (choice.equals("7")) {
                     System.out.print("Enter the base (e.g., 2): ");
                     String base = scanner.nextLine();
                     System.out.print("Enter the exponent (e.g., 3): ");
                     String exponent = scanner.nextLine();
                     double result = Math.pow(Double.parseDouble(base), Double.parseDouble(exponent));
+                    algebraHistory.add(new String[]{"Power: " + base + "^" + exponent, String.valueOf(result)});
                     System.out.println(base + " raised to the power of " + exponent + " is: " + result);
                 } else if (choice.equals("8")) {
                     System.out.print("What variable do you want to solve for? (e.g., x): ");
@@ -750,22 +799,28 @@ public class MathApplication {
                     System.out.print("Enter a trigonometric equation (e.g., sin(x) = 0.5): ");
                     String trigEq = scanner.nextLine();
                     String eqForSolve = trigEq.replace("=", "==");
-                    IExpr solution = evaluator.evaluate("Solve(" + eqForSolve + ", " + var + ")");
+                    IExpr solutionExpr = evaluator.evaluate("Solve(" + eqForSolve + ", " + var + ")");
+                    String solution = solutionExpr.toString();
+                    algebraHistory.add(new String[]{"Trig Solve: " + trigEq + " for " + var, solution});
                     System.out.println("Solution for " + var + ": " + solution);
                 } else if (choice.equals("9")) {
                     System.out.print("Enter the variable for differentiation (e.g., x): ");
                     String var = scanner.nextLine().trim();
                     System.out.print("Enter the function (e.g., x^2 + 3*x): ");
                     String func = scanner.nextLine();
-                    IExpr derivative = evaluator.evaluate("D(" + func + ", " + var + ")");
-                    System.out.println("The derivative of " + func + " with respect to " + var + " is: " + derivative);
+                    IExpr derivativeExpr = evaluator.evaluate("D(" + func + ", " + var + ")");
+                    String solution = derivativeExpr.toString();
+                    algebraHistory.add(new String[]{"Derivative: d/d" + var + " (" + func + ")", solution});
+                    System.out.println("The derivative of " + func + " with respect to " + var + " is: " + solution);
                 } else if (choice.equals("10")) {
                     System.out.print("Enter the variable for integration (e.g., x): ");
                     String var = scanner.nextLine().trim();
                     System.out.print("Enter the function (e.g., x^2 + 3*x): ");
                     String func = scanner.nextLine();
-                    IExpr integral = evaluator.evaluate("Integrate(" + func + ", " + var + ")");
-                    System.out.println("The indefinite integral of " + func + " with respect to " + var + " is: " + integral);
+                    IExpr integralExpr = evaluator.evaluate("Integrate(" + func + ", " + var + ")");
+                    String solution = integralExpr.toString();
+                    algebraHistory.add(new String[]{"Integral: \u222B " + func + " d" + var, solution});
+                    System.out.println("The indefinite integral of " + func + " with respect to " + var + " is: " + solution);
                 } else if (choice.equals("11")) {
                     System.out.print("Enter the dividend polynomial (e.g., x^3 + 2*x^2 + 3): ");
                     String dividend = scanner.nextLine();
@@ -773,30 +828,77 @@ public class MathApplication {
                     String divisor = scanner.nextLine();
                     IExpr quotient = evaluator.evaluate("PolynomialQuotient(" + dividend + ", " + divisor + ", x)");
                     IExpr remainder = evaluator.evaluate("PolynomialRemainder(" + dividend + ", " + divisor + ", x)");
-                    System.out.println("Quotient: " + quotient + ", Remainder: " + remainder);
+                    String solution = "Quotient: " + quotient + ", Remainder: " + remainder;
+                    algebraHistory.add(new String[]{"Poly Div: (" + dividend + ") / (" + divisor + ")", solution});
+                    System.out.println(solution);
                 } else if (choice.equals("12")) {
                     System.out.println("Unit Conversion Options: ");
                     System.out.println("1. Length (cm to m)");
-                    System.out.println("2. Area (m² to km²)");
+                    System.out.println("2. Area (m\u00B2 to km\u00B2)");
+                    System.out.println("3. Temperature (C to F)");
+                    System.out.println("4. Temperature (F to C)");
+                    System.out.println("5. Mass (kg to lbs)");
+                    System.out.println("6. Mass (lbs to kg)");
                     System.out.print("Select an option: ");
                     String opt = scanner.nextLine();
+                    String conversionStr = "";
+                    String resultStr = "";
                     if (opt.equals("1")) {
                         System.out.print("Enter length in cm: ");
                         double cm = Double.parseDouble(scanner.nextLine());
                         double m = cm / 100;
-                        System.out.println(cm + " cm is " + m + " m");
+                        conversionStr = cm + " cm to m";
+                        resultStr = m + " m";
                     } else if (opt.equals("2")) {
-                        System.out.print("Enter area in m²: ");
+                        System.out.print("Enter area in m\u00B2: ");
                         double m2 = Double.parseDouble(scanner.nextLine());
                         double km2 = m2 / 1_000_000;
-                        System.out.println(m2 + " m² is " + km2 + " km²");
+                        conversionStr = m2 + " m\u00B2 to km\u00B2";
+                        resultStr = km2 + " km\u00B2";
+                    } else if (opt.equals("3")) {
+                        System.out.print("Enter temperature in Celsius: ");
+                        double c = Double.parseDouble(scanner.nextLine());
+                        double f = (c * 9/5) + 32;
+                        conversionStr = c + " C to F";
+                        resultStr = f + " F";
+                    } else if (opt.equals("4")) {
+                        System.out.print("Enter temperature in Fahrenheit: ");
+                        double f = Double.parseDouble(scanner.nextLine());
+                        double c = (f - 32) * 5/9;
+                        conversionStr = f + " F to C";
+                        resultStr = c + " C";
+                    } else if (opt.equals("5")) {
+                        System.out.print("Enter mass in kg: ");
+                        double kg = Double.parseDouble(scanner.nextLine());
+                        double lbs = kg * 2.20462;
+                        conversionStr = kg + " kg to lbs";
+                        resultStr = lbs + " lbs";
+                    } else if (opt.equals("6")) {
+                        System.out.print("Enter mass in lbs: ");
+                        double lbs = Double.parseDouble(scanner.nextLine());
+                        double kg = lbs / 2.20462;
+                        conversionStr = lbs + " lbs to kg";
+                        resultStr = kg + " kg";
+                    }
+                    if (!conversionStr.isEmpty()) {
+                        algebraHistory.add(new String[]{"Convert: " + conversionStr, resultStr});
+                        System.out.println(conversionStr + " is " + resultStr);
                     }
                 } else if (choice.equals("13")) {
-                    System.out.println("Calculation History:");
-                    for (String[] entry : history) {
-                        System.out.println(entry[0] + " = " + entry[1]);
+                    System.out.println("\n--- Algebra Calculation History ---");
+                    if (algebraHistory.isEmpty()) {
+                        System.out.println("No history yet.");
+                    } else {
+                        for (int i = 0; i < algebraHistory.size(); i++) {
+                            String[] entry = algebraHistory.get(i);
+                            System.out.printf("%d. %s\n   Result: %s\n", i + 1, entry[0], entry[1]);
+                        }
                     }
+                    System.out.println("----------------------------------\n");
                 } else if (choice.equals("14")) {
+                    algebraHistory.clear();
+                    System.out.println("History cleared.");
+                } else if (choice.equals("15")) {
                     System.out.println("Exiting the calculator.");
                     break;
                 } else {
@@ -806,6 +908,151 @@ public class MathApplication {
                 System.out.println("Error: " + e.getMessage());
             }
         }
+    }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    // ----------------- Statistics -----------------
+    public static void statistics() {
+        System.out.println("Statistics");
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print("Enter numbers separated by space (or 'exit' to quit): ");
+            String input = scanner.nextLine();
+            if (input.toLowerCase().equals("exit")) {
+                break;
+            }
+            try {
+                String[] parts = input.split("\\s+");
+                List<Double> numbers = new ArrayList<>();
+                for (String part : parts) {
+                    numbers.add(Double.parseDouble(part));
+                }
+                if (numbers.isEmpty()) continue;
+                Collections.sort(numbers);
+                
+                double sum = 0;
+                for (double n : numbers) sum += n;
+                double mean = sum / numbers.size();
+                
+                double median;
+                if (numbers.size() % 2 == 0) {
+                    median = (numbers.get(numbers.size() / 2 - 1) + numbers.get(numbers.size() / 2)) / 2.0;
+                } else {
+                    median = numbers.get(numbers.size() / 2);
+                }
+                
+                double variance = 0;
+                for (double n : numbers) variance += Math.pow(n - mean, 2);
+                variance /= numbers.size();
+                double stdDev = Math.sqrt(variance);
+                
+                System.out.println("Mean: " + mean);
+                System.out.println("Median: " + median);
+                System.out.println("Standard Deviation: " + stdDev);
+                System.out.println("Min: " + numbers.get(0));
+                System.out.println("Max: " + numbers.get(numbers.size() - 1));
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    // ----------------- Quadratic Formula -----------------
+    public static void quadratic_formula() {
+        System.out.println("Quadratic Formula Solver (ax\u00B2 + bx + c = 0)");
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print("Enter a, b, and c separated by space (or 'exit' to quit): ");
+            String input = scanner.nextLine();
+            if (input.toLowerCase().equals("exit")) {
+                break;
+            }
+            try {
+                String[] parts = input.split("\\s+");
+                double a = Double.parseDouble(parts[0]);
+                double b = Double.parseDouble(parts[1]);
+                double c = Double.parseDouble(parts[2]);
+                
+                double discriminant = b * b - 4 * a * c;
+                if (discriminant > 0) {
+                    double r1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                    double r2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                    System.out.println("Two real roots: " + r1 + " and " + r2);
+                } else if (discriminant == 0) {
+                    double r = -b / (2 * a);
+                    System.out.println("One real root: " + r);
+                } else {
+                    double realPart = -b / (2 * a);
+                    double imaginaryPart = Math.sqrt(-discriminant) / (2 * a);
+                    System.out.println("Two complex roots: " + realPart + " + " + imaginaryPart + "i and " + realPart + " - " + imaginaryPart + "i");
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    // ----------------- Number Theory -----------------
+    public static void number_theory_tools() {
+        System.out.println("Number Theory Tools");
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("\nOptions:");
+            System.out.println("1. GCD (Greatest Common Divisor)");
+            System.out.println("2. LCM (Least Common Multiple)");
+            System.out.println("3. Prime Factorization");
+            System.out.println("4. Exit");
+            System.out.print("Select an option: ");
+            String choice = scanner.nextLine();
+            if (choice.equals("4")) break;
+            
+            try {
+                if (choice.equals("1")) {
+                    System.out.print("Enter first integer: ");
+                    long a = Long.parseLong(scanner.nextLine());
+                    System.out.print("Enter second integer: ");
+                    long b = Long.parseLong(scanner.nextLine());
+                    System.out.println("GCD: " + gcd(a, b));
+                } else if (choice.equals("2")) {
+                    System.out.print("Enter first integer: ");
+                    long a = Long.parseLong(scanner.nextLine());
+                    System.out.print("Enter second integer: ");
+                    long b = Long.parseLong(scanner.nextLine());
+                    System.out.println("LCM: " + (Math.abs(a * b) / gcd(a, b)));
+                } else if (choice.equals("3")) {
+                    System.out.print("Enter an integer: ");
+                    long n = Long.parseLong(scanner.nextLine());
+                    System.out.println("Prime factors: " + getPrimeFactors(n));
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    private static long gcd(long a, long b) {
+        while (b != 0) {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    private static List<Long> getPrimeFactors(long n) {
+        List<Long> factors = new ArrayList<>();
+        for (long i = 2; i <= n / i; i++) {
+            while (n % i == 0) {
+                factors.add(i);
+                n /= i;
+            }
+        }
+        if (n > 1) factors.add(n);
+        return factors;
     }
 
     // ----------------- Main Menu -----------------
@@ -827,7 +1074,10 @@ public class MathApplication {
             System.out.println("12. Midpoint Formula");
             System.out.println("13. Slope Formula");
             System.out.println("14. Algebra Solver");
-            System.out.println("15. Exit");
+            System.out.println("15. Statistics");
+            System.out.println("16. Quadratic Formula");
+            System.out.println("17. Number Theory Tools");
+            System.out.println("18. Exit");
             System.out.print("Select an option: ");
             String choice = scanner.nextLine();
             if (choice.equals("1")) {
@@ -859,11 +1109,17 @@ public class MathApplication {
             } else if (choice.equals("14")) {
                 algebra_solver();
             } else if (choice.equals("15")) {
+                statistics();
+            } else if (choice.equals("16")) {
+                quadratic_formula();
+            } else if (choice.equals("17")) {
+                number_theory_tools();
+            } else if (choice.equals("18")) {
                 System.out.println("Exiting the Math Application.");
                 break;
             } else {
                 System.out.println("Invalid choice, please try again.");
-                            }
+            }
         }
     }
 
